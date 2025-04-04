@@ -1,0 +1,154 @@
+/* Report Page Styling */
+.report-container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.report-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.user-bio {
+  background: #e3f2fd;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  color: #333;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.report-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.patient-report-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.doctor-report-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.report-card-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #222;
+}
+
+.report-date {
+  font-size: 14px;
+  color: #555;
+}
+
+.report-content {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #444;
+}
+
+.report-doctor {
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+}
+
+.download-btn,
+.submit-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  text-align: center;
+}
+
+.download-btn:hover,
+.submit-btn:hover {
+  background-color: #0056b3;
+}
+
+.report-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Media Query for Larger Screens */
+@media (min-width: 768px) {
+  .report-container {
+    max-width: 1200px; /* Optional: Limits container width on very large screens */
+  }
+
+  .patient-container {
+    
+    width: 100%; /* Ensures the report container takes up full flex space */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  /* Doctor View: Side-by-Side Layout */
+  .doctor-container {
+    display: flex; /* Flexbox layout */
+    flex-direction: row; /* Items laid out side by side */
+    gap: 20px;
+  }
+
+  .report-form {
+    flex: 1; /* Takes up available space */
+    width: 100%; /* Ensures the form is full width, taking up flex space */
+    max-width: 600px; /* Limits the width of the form */
+  }
+
+  .doctor-report-card-container {
+    flex: 1; /* Takes up available space */
+    width: 100%; /* Ensures the report container takes up full flex space */
+    max-width: 600px; /* Limits the width of the report container */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .doctor-report-card {
+    width: 100%;
+  }
+}

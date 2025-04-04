@@ -1,0 +1,308 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  background-color: #f4f7fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Hero Section */
+.home-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.headers {
+  background-color: #2c3e50;
+  padding: 20px;
+  color: #fff;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hero-image img {
+  width: 50px;
+}
+
+.logo h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: #fff;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.hero-text h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.hero-text h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.hero-text p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.auth-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+button {
+  padding: 10px 30px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+.signin-btn {
+  background-color: #27ae60;
+  color: #fff;
+}
+
+.signup-btn {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+button:hover {
+  transform: translateY(-3px);
+}
+
+button:focus {
+  outline: none;
+}
+
+/* Features Section */
+.features {
+  background-color: #fff;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.features h2 {
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+}
+
+.feature-item {
+  margin-bottom: 30px;
+}
+
+.feature-item h3 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+}
+
+.feature-item p {
+  font-size: 1.1rem;
+  color: #7f8c8d;
+}
+
+/* About Section */
+.about {
+  background-color: #f9f9f9;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.about h2 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+.about p {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.8;
+}
+
+/* Services Section */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  padding: 40px 20px;
+}
+
+.service-item {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.service-item h3 {
+  font-size: 1.7rem;
+  margin-bottom: 10px;
+}
+
+.service-item p {
+  font-size: 1.1rem;
+  color: #7f8c8d;
+}
+
+.service-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Testimonials Section */
+.testimonials {
+  background-color: #ecf0f1;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.testimonials h2 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+.testimonial-item {
+  margin-bottom: 30px;
+  font-style: italic;
+}
+
+.testimonial-item blockquote {
+  font-size: 1.2rem;
+  color: #34495e;
+  margin-bottom: 10px;
+}
+
+.testimonial-item cite {
+  font-size: 1rem;
+  color: #7f8c8d;
+}
+
+/* FAQ Section */
+.faq {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.faq h2 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+.faq-item {
+  margin-bottom: 20px;
+}
+
+.faq-item h3 {
+  font-size: 1.7rem;
+  margin-bottom: 10px;
+}
+
+.faq-item p {
+  font-size: 1.1rem;
+  color: #7f8c8d;
+}
+
+/* Footer */
+.footer {
+  background-color: #2c3e50;
+  color: #fff;
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.footer p {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.footer-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.footer a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-text h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-text h2 {
+    font-size: 1.8rem;
+  }
+
+  .hero-text p {
+    font-size: 1rem;
+  }
+
+  .auth-buttons {
+    flex-direction: column;
+  }
+
+  .auth-buttons button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    padding: 40px 10px;
+  }
+
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+
+  .feature-item h3 {
+    font-size: 1.5rem;
+  }
+
+  .feature-item p {
+    font-size: 1rem;
+  }
+
+  .footer p {
+    font-size: 0.9rem;
+  }
+}

@@ -1,0 +1,78 @@
+/* Settings Container */
+.settings-container {
+  width: 100%;
+  height: 100%;
+
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+h2 {
+  text-align: center;
+  color: #222;
+}
+
+/* Profile Details */
+.profile-info {
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 5px;
+}
+
+.profile-info p {
+  margin: 5px 0;
+  font-weight: bold;
+}
+
+/* Form Styles */
+form {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+/* Button */
+button {
+  margin-top: 15px;
+  padding: 10px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .settings-container {
+    width: 100%;
+    height: 100%;
+  }
+}

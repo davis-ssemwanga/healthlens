@@ -1,0 +1,16 @@
+.ai-button {
+    width: 100%;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+  }
+  .ai-button:hover {
+    background-color: #0056b3;
+  }
+  .ai-container {
+    flex-direction: column;
+  }  

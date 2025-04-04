@@ -1,0 +1,8 @@
+<div className="app">
+        <div className="dashboard-container">
+          <nav className="main-nav">
+            <div className="nav-links">
+              <Link to="/">Home</Link>
+              
+            </div>
+          </nav>
