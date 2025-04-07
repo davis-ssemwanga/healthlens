@@ -10,6 +10,7 @@ router.register(r'patients', views.PatientViewSet)
 router.register(r'patient', views.PatientProfileViewSet, basename='patient-profile')
 router.register(r'doctors', views.DoctorViewSet)
 router.register(r'doctor/details', views.DoctorDetailsViewSet, basename='doctor-details')
+router.register(r'doctor-availability', views.DoctorAvailabilityViewSet, basename='doctor-availability')
 router.register(r'appointments', views.AppointmentViewSet)
 router.register(r'prescriptions', views.PrescriptionViewSet)
 router.register(r'notification', views.NotificationViewSet)
@@ -27,6 +28,7 @@ router.register(r'call', views.CallLogViewSet, basename="calls")
 router.register(r'reports', views.ReportViewSet, basename="reports")
 router.register(r'aimodels', views.AIModelViewSet, basename='aimodels')
 router.register(r'auth', views.AuthenticationViewSet, basename='authentication')
+router.register(r'earnings', views.EarningViewSet, basename="earnings")
 
 
 # Add the URL patterns for the router

@@ -14,14 +14,19 @@ import {
   FaFileAlt,
   FaCog,
   FaCalendar,
+  FaMoneyBill,
+  FaBars,
 } from "react-icons/fa";
 import Cookies from "js-cookie";
 import { createWebSocketConnection } from "../api";
+import Earnings from "./Earnings";
+import logo from "./assets/logo.jpg";
 
 function DoctorDashboard() {
   const [activeComponent, setActiveComponent] = useState("aimodel");
   const [incomingCall, setIncomingCall] = useState(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [isNavVisible, setIsNavVisible] = useState(true);
   const socketRef = useRef(null);
   const videoRef = useRef(null);
 
@@ -44,6 +49,10 @@ function DoctorDashboard() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    setIsNavVisible(false);
+  }, [activeComponent]);
 
   const handleLogout = () => {
     Cookies.remove("auth_token");
@@ -95,6 +104,9 @@ function DoctorDashboard() {
   const handleVideoReady = () => {
     setIsVideoReady(true);
   };
+  const toggleNav = () => {
+    setIsNavVisible(!isNavVisible);
+  };
 
   const renderComponent = () => {
     switch (activeComponent) {
@@ -118,6 +130,8 @@ function DoctorDashboard() {
         return <Settings />;
       case "appointments":
         return <Appointments />;
+      case "earnings":
+        return <Earnings />;
       default:
         return <AIModel modelType="doctor_analytics" />;
     }
@@ -127,15 +141,15 @@ function DoctorDashboard() {
     <div className="dashboard">
       <header className="header">
         <div className="header-left">
-          <img src="/logo.png" alt="Logo" className="logo" />
-          <h2 className="dashboard-title">Doctor Dashboard</h2>
+          <button className="hamburger-btn" onClick={toggleNav}>
+            <FaBars />
+          </button>
+          <img src={logo} alt="Logo" className="logo" />
         </div>
-        <button onClick={handleLogout} className="logout-btn">
-          <FaSignOutAlt /> Logout
-        </button>
+        <h2 className="dashboard-title">Doctor Dashboard</h2>
       </header>
       <div className="dashboard-body">
-        <nav className="nav">
+        <nav className={`nav ${isNavVisible ? "show" : ""}`}>
           <button
             className={activeComponent === "aimodel" ? "active" : ""}
             onClick={() => setActiveComponent("aimodel")}
@@ -172,9 +186,19 @@ function DoctorDashboard() {
           >
             <FaCalendar /> Appointments {/* Confirmed: Using FaCalendar */}
           </button>
+          <button
+            className={activeComponent === "earnings" ? "active" : ""}
+            onClick={() => setActiveComponent("earnings")}
+          >
+            <FaMoneyBill /> Earnings
+          </button>
+          <button onClick={handleLogout} className="logout-btn">
+            <FaSignOutAlt /> Logout
+          </button>
         </nav>
         <div className="content">{renderComponent()}</div>
       </div>
+
       {incomingCall && (
         <div className="incoming-call-overlay">
           <h2>Incoming Call from {incomingCall.fromUserName}</h2>

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from doctors.models import Doctor
 from patients.models import Patient
-from appointments.models import Appointment
+from appointments.models import Appointment, DoctorAvailability
 from prescriptions.models import Prescription
 from notifications.models import Notification
 from users.models import User
@@ -11,6 +11,7 @@ from ai_models.models import AIModel
 from chat.models import ChatLog, Conversation, MessageReadReceipt, Notifications, UserBlock
 from django.contrib.auth.hashers import make_password
 from .models import DoctorPatientMatch
+from earnings.models import Earning
 
 
 class AuthenticationSerializer(serializers.ModelSerializer):
@@ -49,9 +50,16 @@ class PatientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
         fields = '__all__'
+#Availabilty serializer
+class DoctorAvailabilitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DoctorAvailability
+        fields = ['id','doctor', 'date', 'start_time', 'end_time', 'appointment_duration', 'fee']
 
 # Appointment Serializer
 class AppointmentSerializer(serializers.ModelSerializer):
+    doctor_availability = DoctorAvailabilitySerializer(many=True, read_only=True, source='doctor.availability')
+
     class Meta:
         model = Appointment
         fields = '__all__'
@@ -139,15 +147,15 @@ class ReportSerializer(serializers.ModelSerializer):
     def get_latest_text_ai(self, obj):
         # Fetch the latest AIModel with source='text' for this patient
         latest_text = AIModel.objects.filter(
-           user = obj.get('patient') if isinstance(obj, dict) else obj.patient
-        ).order_by('-created_at').first()
+            user=obj.patient if isinstance(obj, Report) else obj.get('patient')
+        ).filter(source='text').order_by('-created_at').first()
         return AIModelSerializer(latest_text).data if latest_text else None
 
     def get_latest_image_ai(self, obj):
         # Fetch the latest AIModel with source='image' for this patient
         latest_image = AIModel.objects.filter(
-            user = obj.get('patient') if isinstance(obj, dict) else obj.patient
-        ).order_by('-created_at').first()
+            user=obj.patient if isinstance(obj, Report) else obj.get('patient')
+        ).filter(source='image').order_by('-created_at').first()
         return AIModelSerializer(latest_image).data if latest_image else None
 
 class AIAnalysisSerializer(serializers.Serializer):
@@ -159,3 +167,8 @@ class DoctorPatientMatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoctorPatientMatch
         fields = '__all__'
+
+class EarningSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Earning
+        fields = ['id', 'doctor', 'appointment', 'amount', 'date_earned']

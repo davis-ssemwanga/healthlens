@@ -294,22 +294,7 @@ export const getUsers = async () => {
   }
 };
 
-// Fetch appointments
-export const getAppointments = async () => {
-  try {
-    const response = await api.get("/appointments/");
-    return response.data;
-  } catch (error) {
-    console.error(
-      "Error fetching appointments:",
-      error.response?.data || error.message
-    );
-    throw error.response?.data || error;
-  }
-};
-
 // Fetch user-specific appointments
-// api.js
 export const getUserAppointments = async () => {
   try {
     const response = await api.get("/appointments/");
@@ -356,6 +341,46 @@ export const updateAppointmentApproval = async (
       error.response?.data || error.message
     );
     throw error.response?.data || error;
+  }
+};
+
+// Fetch doctor's availability
+export const getDoctorAvailability = async (doctorId) => {
+  try {
+    const response = await api.get(`/doctor-availability/?doctor=${doctorId}`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching availability:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+// Create doctor availability
+export const createDoctorAvailability = async (data) => {
+  try {
+    const response = await api.post("/doctor-availability/", data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error creating availability:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+export const getEarningsSummary = async () => {
+  try {
+    const response = await api.get("/earnings/summary/");
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching earnings summary:",
+      error.response?.data || error.message
+    );
+    throw error;
   }
 };
 

@@ -1,0 +1,23 @@
+.earnings-card {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.earnings-table {
+  margin-top: 10px;
+}
+
+.earnings-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.earnings-table th,
+.earnings-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}

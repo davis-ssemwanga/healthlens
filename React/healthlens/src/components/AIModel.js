@@ -179,7 +179,9 @@ function AIModel({ modelType }) {
 
       {showModal && !expandedResult && (
         <Modal onClose={() => setShowModal(false)}>
-          <h2 className="text-3xl font-bold mb-4">AI Prediction Result</h2>
+          <div className="modal-header flex justify-between items-center">
+            <h2 className="text-3xl font-bold mb-4">AI Prediction Result</h2>
+          </div>
           {analysisError ? (
             <p className="text-red-500 mb-4">{analysisError}</p>
           ) : predictions.length > 0 ? (
@@ -212,6 +214,12 @@ function AIModel({ modelType }) {
           ) : (
             <p className="text-gray-500">No prediction available.</p>
           )}
+          <button
+            className="text-xl font-bold text-gray-600"
+            onClick={() => setShowModal(false)}
+          >
+            close
+          </button>
         </Modal>
       )}
 
@@ -222,7 +230,9 @@ function AIModel({ modelType }) {
             setExpandedResult(null);
           }}
         >
-          <h2 className="text-3xl font-bold mb-4">Previous Analysis</h2>
+          <div className="modal-header flex justify-between items-center">
+            <h2 className="text-3xl font-bold mb-4">Previous Analysis</h2>
+          </div>
           <div className="text-lg">
             <p>
               <strong>Diagnosis:</strong> {expandedResult.disease}
@@ -253,6 +263,12 @@ function AIModel({ modelType }) {
                 : "N/A"}
             </p>
           </div>
+          <button
+            className="text-xl font-bold text-gray-600"
+            onClick={() => setShowModal(false)}
+          >
+            Close
+          </button>
         </Modal>
       )}
     </div>

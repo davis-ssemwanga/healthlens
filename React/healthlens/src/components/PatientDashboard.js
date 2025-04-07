@@ -5,6 +5,7 @@ import Chat from "./Chat";
 import Report from "./Report";
 import Settings from "./Settings";
 import Appointments from "./Appointments";
+import logo from "./assets/logo.jpg";
 import "../App.css";
 import {
   FaSignOutAlt,
@@ -14,6 +15,7 @@ import {
   FaFileAlt,
   FaCog,
   FaCalendarAlt,
+  FaBars,
 } from "react-icons/fa";
 import Cookies from "js-cookie";
 import { createWebSocketConnection } from "../api";
@@ -22,6 +24,7 @@ function PatientDashboard() {
   const [activeComponent, setActiveComponent] = useState("aimodel");
   const [incomingCall, setIncomingCall] = useState(null);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [isNavVisible, setIsNavVisible] = useState(true);
   const socketRef = useRef(null);
   const videoRef = useRef(null);
 
@@ -46,6 +49,10 @@ function PatientDashboard() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    setIsNavVisible(false);
+  }, [activeComponent]);
 
   const handleLogout = () => {
     Cookies.remove("auth_token");
@@ -124,20 +131,23 @@ function PatientDashboard() {
         return <AIModel modelType="patient_analytics" />;
     }
   };
+  const toggleNav = () => {
+    setIsNavVisible(!isNavVisible);
+  };
 
   return (
     <div className="dashboard">
       <header className="header">
         <div className="header-left">
-          <img src="/logo.png" alt="Logo" className="logo" />
-          <h2 className="dashboard-title">Patient Dashboard</h2>
+          <button className="hamburger-btn" onClick={() => toggleNav()}>
+            <FaBars />
+          </button>
+          <img src={logo} alt="Logo" className="logo" />
         </div>
-        <button onClick={handleLogout} className="logout-btn">
-          <FaSignOutAlt /> Logout
-        </button>
+        <h2 className="dashboard-title">Patient Dashboard</h2>
       </header>
       <div className="dashboard-body">
-        <nav className="nav">
+        <nav className={`nav ${isNavVisible ? "show" : ""}`}>
           <button
             className={activeComponent === "aimodel" ? "active" : ""}
             onClick={() => setActiveComponent("aimodel")}
@@ -174,7 +184,11 @@ function PatientDashboard() {
           >
             <FaCalendarAlt /> Appointments
           </button>
+          <button onClick={handleLogout} className="logout-btn">
+            <FaSignOutAlt /> Logout
+          </button>
         </nav>
+
         <div className="content">{renderComponent()}</div>
       </div>
       {incomingCall && (

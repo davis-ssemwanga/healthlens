@@ -1,13 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import logo from "./assets/logo.jpg";
 import AIModel from "./AIModel";
 import DoctorActivity from "./DoctorActivity";
 import Settings from "./Settings";
 import "../App.css"; // Global styles applied to all dashboards
-import { FaUserMd, FaRobot, FaCog, FaSignOutAlt } from "react-icons/fa";
+import { FaUserMd, FaRobot, FaCog, FaSignOutAlt, FaBars } from "react-icons/fa";
 import Cookies from "js-cookie";
 
 function ManagerDashboard() {
   const [activeComponent, setActiveComponent] = useState("aimodel");
+  const [isNavVisible, setIsNavVisible] = useState(true); // Control nav visibility
+
+  useEffect(() => {
+    setIsNavVisible(false);
+  }, [activeComponent]);
 
   const renderComponent = () => {
     switch (activeComponent) {
@@ -27,19 +33,24 @@ function ManagerDashboard() {
     window.location.href = "/signin";
   };
 
+  const toggleNav = () => {
+    setIsNavVisible(!isNavVisible);
+  };
+
   return (
     <div className="dashboard">
       <header className="header">
         <div className="header-left">
-          <img src="/logo.png" alt="Logo" className="logo" />
-          <h2 className="dashboard-title">Manager Dashboard</h2>
+          <button className="hamburger-btn" onClick={toggleNav}>
+            <FaBars />
+          </button>
+          <img src={logo} alt="Logo" className="logo" />
         </div>
-        <button onClick={handleLogout} className="logout-btn">
-          <FaSignOutAlt /> Logout
-        </button>
+        <h2 className="dashboard-title">Manager Dashboard</h2>
       </header>
+
       <div className="dashboard-body">
-        <nav className="nav">
+        <nav className={`nav ${isNavVisible ? "show" : ""}`}>
           <button
             className={activeComponent === "aimodel" ? "active" : ""}
             onClick={() => setActiveComponent("aimodel")}
@@ -57,6 +68,9 @@ function ManagerDashboard() {
             onClick={() => setActiveComponent("settings")}
           >
             <FaCog /> Settings
+          </button>
+          <button onClick={handleLogout} className="logout-btn">
+            <FaSignOutAlt /> Logout
           </button>
         </nav>
         <div className="content">{renderComponent()}</div>

@@ -250,7 +250,7 @@ function Report() {
         rightAlignX,
         yPos + 9
       );
-      doc.line(rightAlignX, yPos + 10, rightAlignX + 60, yPos + 10);
+      doc.line(rightAlignX, yPos + 9, rightAlignX + 60, yPos + 9);
       doc.setFontSize(11);
       doc.text("On", rightAlignX, yPos + 18);
       doc.text(new Date().toLocaleDateString(), rightAlignX + 10, yPos + 18);

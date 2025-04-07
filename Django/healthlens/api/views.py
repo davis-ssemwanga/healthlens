@@ -1,3 +1,6 @@
+from datetime import timedelta
+import logging
+from django.forms import ValidationError
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from ai_models.predict_disease import get_prediction_results, image_analyzer
@@ -12,10 +15,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from api.models import DoctorPatientMatch
 from ai_models.imageProcessor import predict_skin_condition
 from users.models import User
-from .serializers import AuthenticationSerializer, DoctorPatientMatchSerializer
+from .serializers import AuthenticationSerializer, DoctorAvailabilitySerializer, DoctorPatientMatchSerializer
 from patients.models import Patient
 from doctors.models import Doctor, DoctorLeave
-from appointments.models import Appointment
+from appointments.models import Appointment, DoctorAvailability
 from prescriptions.models import Prescription
 from notifications.models import Notification
 from users.models import User
@@ -23,21 +26,24 @@ from chat.models import ChatLog, Conversation, MessageReadReceipt, Notifications
 from calls.models import CallSession
 from ai_reports.models import Report
 from ai_models.models import AIModel
+from earnings.models import Earning
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import Q
-from appointments.models import models
 
 from django.contrib.auth import get_user_model
+from django.db.models import Sum
 
+logger = logging.getLogger(__name__)
 
+timezone.activate('Africa/Nairobi')
 
 User = get_user_model()
 from .serializers import (
     ChatLogSerializer, ConversationSerializer, MessageReadReceiptSerializer, NotificationsSerializer, PatientSerializer, DoctorSerializer, AppointmentSerializer,
     PrescriptionSerializer, NotificationSerializer, UserSerializer,
-    CallLogSerializer, AIReportSerializer, AIModelSerializer, AuthenticationSerializer,AIAnalysisSerializer,ReportSerializer
+    CallLogSerializer, AIReportSerializer, AIModelSerializer, AuthenticationSerializer,AIAnalysisSerializer,ReportSerializer,EarningSerializer
 )
 
 class AuthenticationViewSet(viewsets.ModelViewSet):
@@ -86,6 +92,7 @@ class AuthenticationViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def verify(self, request):
         user = request.user
+        print(user)
         if user.is_authenticated:
             return Response({"user": AuthenticationSerializer(user).data}, status=status.HTTP_200_OK)
         return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -190,6 +197,33 @@ class DoctorDetailsViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class DoctorAvailabilityViewSet(viewsets.ModelViewSet):
+    queryset = DoctorAvailability.objects.all()
+    serializer_class = DoctorAvailabilitySerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            return DoctorAvailability.objects.none()
+
+        # Check for doctor query parameter (e.g., ?doctor=5)
+        doctor_id = self.request.query_params.get('doctor')
+        if doctor_id:
+            return DoctorAvailability.objects.filter(doctor_id=doctor_id)
+
+        # If the user is a doctor, show their own availability
+        if user.role == 'doctor':
+            return DoctorAvailability.objects.filter(doctor=user)
+
+        return DoctorAvailability.objects.none()
+
+    def perform_create(self, serializer):
+        # Ensure doctor is set to the authenticated user if they are a doctor
+        if self.request.user.role == 'doctor':
+            serializer.save(doctor=self.request.user)
+        else:
+            serializer.save()
 
 class AppointmentViewSet(viewsets.ModelViewSet):
     queryset = Appointment.objects.all()
@@ -198,10 +232,134 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated:
-            # Filter appointments where the user is either the patient or doctor
             return Appointment.objects.filter(Q(patient=user) | Q(doctor=user))
-        return Appointment.objects.none() 
+        return Appointment.objects.none()
 
+    def perform_create(self, serializer):
+        # Validate time slot availability
+        appointment_data = serializer.validated_data
+        doctor = appointment_data['doctor']
+        appt_time = appointment_data['date']
+
+        # Convert appt_time to EAT if it’s UTC
+        if appt_time.tzinfo:  # If timezone-aware (e.g., UTC from frontend)
+            appt_time = timezone.localtime(appt_time, timezone.get_current_timezone())
+        appt_date = appt_time.date()
+
+        # Check doctor's availability
+        availability = DoctorAvailability.objects.filter(doctor=doctor, date=appt_date).first()
+        if not availability:
+            raise ValidationError("Doctor is not available on this date.")
+
+        # Create timezone-aware start and end times in EAT
+        start_datetime = timezone.make_aware(
+            timezone.datetime.combine(appt_date, availability.start_time),
+            timezone.get_current_timezone()  # EAT
+        )
+        end_datetime = timezone.make_aware(
+            timezone.datetime.combine(appt_date, availability.end_time),
+            timezone.get_current_timezone()  # EAT
+        )
+
+        # Debug logging
+        logger.info(f"appt_time (EAT): {appt_time}")
+        logger.info(f"start_datetime (EAT): {start_datetime}")
+        logger.info(f"end_datetime (EAT): {end_datetime}")
+        logger.info(f"Condition: {start_datetime <= appt_time < end_datetime}")
+
+        # Check if appointment time is within availability
+        if not (start_datetime <= appt_time < end_datetime):
+            raise ValidationError("Appointment time is outside doctor's availability.")
+
+        # Check for overlapping appointments
+        duration = availability.appointment_duration
+        appt_end = appt_time + timezone.timedelta(minutes=duration)
+        overlapping = Appointment.objects.filter(
+            doctor=doctor,
+            date__gte=appt_time,
+            date__lt=appt_end
+        ).exclude(status='canceled')
+        
+        if overlapping.exists():
+            raise ValidationError("This time slot is already booked.")
+
+        # Save appointment with availability reference
+        appointment = serializer.save(modified_by=self.request.user, doctor_availability=availability)
+        
+        # Log earning if fully approved AND time has passed
+        if appointment.is_fully_approved() and appointment.date <= timezone.now():
+            Earning.objects.create(
+                doctor=appointment.doctor,
+                appointment=appointment,
+                amount=availability.fee
+            )
+
+class EarningViewSet(viewsets.ModelViewSet):
+    queryset = Earning.objects.all()
+    serializer_class = EarningSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated and user.role == 'doctor':
+            return Earning.objects.filter(doctor=user)
+        return Earning.objects.none()
+
+    @action(detail=False, methods=['get'])
+    def summary(self, request):
+        user = request.user
+        if user.role != 'doctor':
+            return Response({"error": "Only doctors can view earnings"}, status=403)
+        
+        now = timezone.now()
+        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        # Daily Earnings: Past appointments today
+        daily_earnings = Appointment.objects.filter(
+            doctor=user,
+            date__gte=today_start,
+            date__lte=now,
+            approval_status_doctor='approved',
+            approval_status_patient='approved'
+        ).aggregate(
+            total=Sum('doctor_availability__fee')
+        )['total'] or 0.00
+
+        # Weekly Earnings: Monday to current day (workweek ends Friday)
+        days_since_sunday = now.weekday() + 1 if now.weekday() < 6 else 0
+        week_start = today_start - timedelta(days=days_since_sunday)
+        if now.weekday() > 4:
+            week_end = week_start + timedelta(days=5)
+        else:
+            week_end = now
+
+        weekly_earnings = Appointment.objects.filter(
+            doctor=user,
+            date__gte=week_start,
+            date__lte=week_end,
+            approval_status_doctor='approved',
+            approval_status_patient='approved'
+        ).aggregate(
+            total=Sum('doctor_availability__fee')
+        )['total'] or 0.00
+
+        # Monthly Earnings: Last 4 weeks
+        month_start = today_start - timedelta(weeks=4)
+        monthly_earnings = Appointment.objects.filter(
+            doctor=user,
+            date__gte=month_start,
+            date__lte=now,
+            approval_status_doctor='approved',
+            approval_status_patient='approved'
+        ).aggregate(
+            total=Sum('doctor_availability__fee')
+        )['total'] or 0.00
+
+        return Response({
+            "daily": float(daily_earnings),
+            "weekly": float(weekly_earnings),
+            "monthly": float(monthly_earnings)
+        })
+    
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
